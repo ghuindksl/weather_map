@@ -3,8 +3,8 @@ part 'weathermodel.g.dart';
 
 @JsonSerializable()
 class CurrentWeatherModel{
-  final WeatherModel weather;
-  final CityModel name;
+  final List<WeatherModel> weather;
+  final String name;
   final TemperatureModel main;
 
   CurrentWeatherModel(this.weather, this.name, this.main);
@@ -17,14 +17,6 @@ class WeatherModel{
 
   WeatherModel(this.description);
   factory WeatherModel.fromJson(Map<String, dynamic> json)=>_$WeatherModelFromJson(json);
-}
-
-@JsonSerializable()
-class CityModel{
-  final String name;
-
-  CityModel(this.name);
-  factory CityModel.fromJson(Map<String, dynamic> json)=>_$CityModelFromJson(json);
 }
 
 @JsonSerializable()
