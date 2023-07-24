@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:weather_map/api/client.dart';
+import 'package:weather_map/api/weathermodel.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,29 +13,30 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    ModelView modelView = ModelView();
+    Client a = Client();
+    modelView.getWeather(a, 25.4, 87.5);
+    print(modelView._nameOfCity);
+    return Provider(
+      create: (context) => modelView,
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: const MainScreen(),
       ),
-      home: const MainScreen(),
     );
   }
 }
 
 class MainScreen extends StatelessWidget {
-
-
   const MainScreen({super.key});
-
 
 
   @override
   Widget build(BuildContext context) {
-
-    Client client = Client();
-    client.getCurrentWeather(44.34, 10.99);
 
     return Scaffold(
       body: Container(
@@ -52,10 +55,10 @@ class MainScreen extends StatelessWidget {
                 height: 139,
               ),
               const Text(
-                "Montreal",
+                "",
                 style: TextStyle(
                   fontSize: 34,
-                  height: 41/34,
+                  height: 41 / 34,
                   fontWeight: FontWeight.w100,
                   color: Colors.white,
                   fontFamily: "San Francisco",
@@ -121,3 +124,25 @@ class MainScreen extends StatelessWidget {
     );
   }
 } //TODO: создать модель view. там должна быть поля в которых будут храниться значения отображаемых данных. публичный метод который запрвашиет текущую погоду и эту модель через провайдер и подписаться на изменения 
+
+class ModelView extends ChangeNotifier{
+  String _nameOfCity = "";
+  double _temp = 0.0;
+  double _tempMin = 0.0;
+  double _tempMax = 0.0;
+  List<WeatherModel> _desc =[];
+  Future<void> getWeather(Client caseWeather, double lat, double lot) async {
+    var b = await caseWeather.getCurrentWeather(lat, lot);
+    _nameOfCity = b.name;
+    _temp=b.main.temp;
+    _tempMax=b.main.temp_max;
+    _tempMin=b.main.temp_min;
+    _desc=b.weather;
+    notifyListeners();
+  }
+  String get name => _nameOfCity;
+  double get temp => _temp;
+  double get tempMin => _tempMin;
+  double get tempMax => _tempMax;
+  List<WeatherModel> get descsript => _desc;
+}
